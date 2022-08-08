@@ -45,15 +45,15 @@ if os.path.exists(my_file):
 Wrong Example (API Definition Order)
 You should define the special path on top !
 See <----
-'''
-# @app.get('/books/{book_id}') <----
-# def get_book(book_id: string):
-#     print(f'Return book to Client: {book_id}')
-#     return book_id
-# @app.get('/books/only_for_me') <----
-# def get_book_only_for_me(book_id: string):
-#     return 'the book that I can read only'
 
+@app.get('/books/{book_id}') <----
+def get_book(book_id: string):
+    print(f'Return book to Client: {book_id}')
+    return book_id
+@app.get('/books/only_for_me') <----
+def get_book_only_for_me(book_id: string):
+    return 'the book that I can read only'
+'''
 # GET Method Exercise (Basic)
 @app.get('/')
 async def root():
