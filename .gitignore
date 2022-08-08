@@ -1,0 +1,10 @@
+# Folder
+__pycache__
+PowerPoint
+AWS
+LineBot
+.DS_Store
+# File
+*.json
+*.pem
+*.ppk
