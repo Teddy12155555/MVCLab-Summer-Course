@@ -40,7 +40,7 @@ def print_func_time(time):
 # Decorator with Class
 class Item:
     def __init__(self, func):
-        self.name = 'Template'
+        self.name = func.__name__
         self.item_func = func
 
     def show_item(self):

@@ -25,7 +25,6 @@ class MyException(Exception):
 # Pokedex Link
 pokemons_link = 'https://pokemondb.net/pokedex/all'
 
-
 # Get all information from link (html)
 doc = PyQuery(url=pokemons_link)
 # Get information under <tr>
