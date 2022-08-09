@@ -4,16 +4,23 @@ import json
 import random
 import shutil
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from typing import  Union
 from pyquery import PyQuery
 from pydantic import BaseModel
 from uuid import uuid4 # Universally Unique Identifier
 
+# PyDantic BaseModel Class
 class Item(BaseModel):
     name: str
     description: Union[str, None] = None # Optional value (See in FastAPI/docs)
     price: float
     tax: Union[float, None] = None # Optional value (See in FastAPI/docs)
+
+# Exception Class
+class MyException(Exception):
+    def __init__(self, name: str):
+        self.name = name
 
 # Pokedex Link
 pokemons_link = 'https://pokemondb.net/pokedex/all'
@@ -30,7 +37,7 @@ pokemons_name = pokemons_.find('.ent-name').text().split(' ')
 # Create a dictionary with keys and values
 my_pokedex = dict(zip(pokemons_index, pokemons_name))
 
-app = FastAPI()
+app = FastAPI() # FastAPI Module
 
 # Local data initialize
 my_items = []
@@ -56,7 +63,7 @@ def get_book_only_for_me(book_id: string):
 '''
 # GET Method Exercise (Basic)
 @app.get('/')
-async def root():
+def root():
     return {"message": "FastAPI in Python"}
 
 # GET Method Exercise
@@ -68,6 +75,10 @@ def random_pokemon():
 @app.get('/get-pokemon')
 def get_pokemon(poke_id: int = 1):
     if poke_id > len(my_pokedex):
+        '''
+            ---> Try to Change this HTTPException below into your own Exception ! <---
+            You can use any status_code between 400 to 499 as client error
+        '''
         raise HTTPException(404, f"Pokemon ID {poke_id} not in your pokedex")
     else:
         # Turn integer value to string and leading zero as len == 3
@@ -80,12 +91,22 @@ def get_pokemon(poke_id: int = 1):
 
 # GET Method Exercise
 @app.get('/show-pokemons')
-async def show_pokemons():
+def show_pokemons():
     return {'This is my pokedex' : my_pokedex}
 
+# Exception Handler
+@app.exception_handler(MyException)
+def call_exception_handler(exc: MyException):
+    return JSONResponse (
+        status_code= 420,
+        content= {
+            'Message' : f'Oops ! {exc.name} did something. There goes a rainbow ...'
+        }
+    )
+
 # POST Method Exercise
-@app.post('/add-item')
-async def create_item(item: Item):
+@app.post('/add-item', response_model=Item)
+def create_item(item: Item):
     item_dict = item.dict()
     if item.tax:
         price_with_tax = item.price + item.tax
@@ -100,9 +121,13 @@ async def create_item(item: Item):
     return item_dict
 
 # GET/POST Method Result
-@app.get('/show-items', response_model=Item, response_model_exclude_unset=True)
-async def show_item():
-    return {'Items':my_items}
+@app.get('/show-items')
+def show_item():
+    if len(my_items):
+        return {'Items':my_items}
+    else:
+        # Create a exception message
+        raise HTTPException(404, 'Item not found')
 
 '''
 Inorder to recieve upload file
@@ -124,8 +149,8 @@ def Upload_file(file: Union[UploadFile, None] = None):
         my_file_names.append(file.filename)
         return {"Result" : "OK"}
     except:
-        return {"File Save Error":"Error when loading file or saving file"}
+        raise MyException(name='Upload File')
 
 # if __name__ == "__main__":
 #     import uvicorn
-#     uvicorn.run(app= 'fastapi_tutorial:app', reload= True, host= '127.0.0.1', port= '8000')
+#     uvicorn.run(app= 'fastapi_tutorial:app', reload= True) # Default host = 127.0.0.1, port = 8000

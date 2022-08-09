@@ -3,6 +3,7 @@ __pycache__
 PowerPoint
 AWS
 LineBot
+FastAPI/fastapi-tutorial
 .DS_Store
 # File
 *.json
