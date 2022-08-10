@@ -82,7 +82,7 @@ def get_pokemon(poke_id: int = 1):
             ---> Try to Change this HTTPException below into your own Exception ! <---
             You can use any status_code between 400 to 499 as client error
         '''
-        raise HTTPException(404, f"Pokemon ID {poke_id} not in your pokedex")
+        raise HTTPException(404, f"Pokemon ID {poke_id} is not in your pokedex")
     else:
         # Turn integer value to string and leading zero as len == 3
         pokemon_id = str(poke_id).zfill(3)
@@ -90,7 +90,7 @@ def get_pokemon(poke_id: int = 1):
         if pokemon_id in my_pokedex:
             return {f"Pokemon ID = {pokemon_id}":f"Pokemon Name = {my_pokedex[pokemon_id]}"}
         else:
-            raise HTTPException(404, f"Pokemon ID {pokemon_id} not in your pokedex")
+            raise HTTPException(404, f"Pokemon ID {pokemon_id} is not in your pokedex")
 
 # GET Method Exercise
 @app.get('/show-pokemons')
