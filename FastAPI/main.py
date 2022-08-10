@@ -63,14 +63,18 @@ def get_book_only_for_me(book_id: string):
 # GET Method Exercise (Basic)
 @app.get('/')
 def root():
-    return {"message": "FastAPI in Python"}
+    return {"message": "Hello Welcome to  My FastAPI in Web writing by Python"}
 
 # GET Method Exercise
 @app.get('/random-pokemon')
 def random_pokemon():
     return random.choice(list(my_pokedex.items()))
 
-# GET Method Exercise (Interact with local database)
+'''
+    ---> Try to Change this API below into path parameter API ! <---
+    Where is their difference ? You can see page 17 in powerpoint !
+'''
+# GET Method Exercise (Interact with local database), query parameter
 @app.get('/get-pokemon')
 def get_pokemon(poke_id: int = 1):
     if poke_id > len(my_pokedex):
@@ -148,8 +152,8 @@ def Upload_file(file: Union[UploadFile, None] = None):
         my_file_names.append(file.filename)
         return {"Result" : "OK"}
     except:
-        raise MyException(name='Upload File')
+        raise MyException(name=f'Upload File {file.filename}')
 
 # if __name__ == "__main__":
 #     import uvicorn
-#     uvicorn.run(app= 'fastapi_tutorial:app', reload= True) # Default host = 127.0.0.1, port = 8000
+#     uvicorn.run(app= 'main:app', reload= True) # Default host = 127.0.0.1, port = 8000
