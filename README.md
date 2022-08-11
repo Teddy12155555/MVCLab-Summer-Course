@@ -9,5 +9,10 @@
 
 ### FastAPI
 * **Date: 08/11**
-
+* **How to run**
+    * **Step 1: Install Python Packages**
+        * > pip install -r requirements.txt
+    * **Step 2: Run by uvicorn (Localhost)**
+        * > uvicorn main:app --reload
+        * Default host = 127.0.0.1, port = 8000
 ### LineBot
