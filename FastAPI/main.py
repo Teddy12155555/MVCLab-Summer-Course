@@ -1,9 +1,15 @@
+'''
+Python Packages Install
+    > pip install -r requirements.txt
+How to run
+    > uvicorn main:app --reload
+'''
 # FastAPI Tutorial with Basic PyQuery Project
 import os
 import json
 import random
 import shutil
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile, Request
 from fastapi.responses import JSONResponse
 from typing import  Union
 from pyquery import PyQuery
@@ -99,7 +105,7 @@ def show_pokemons():
 
 # Exception Handler
 @app.exception_handler(MyException)
-def call_exception_handler(exc: MyException):
+def call_exception_handler(request:Request, exc: MyException):
     return JSONResponse (
         status_code= 420,
         content= {
@@ -154,6 +160,12 @@ def Upload_file(file: Union[UploadFile, None] = None):
     except:
         raise MyException(name=f'Upload File {file.filename}')
 
+'''
+Notion:
+    If you want to run this command below
+        > python main.py
+    You have to uncomment the main function below !
+'''
 # if __name__ == "__main__":
 #     import uvicorn
 #     uvicorn.run(app= 'main:app', reload= True) # Default host = 127.0.0.1, port = 8000
