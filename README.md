@@ -15,4 +15,6 @@
     * **Step 2: Run by uvicorn (Localhost)**
         * > uvicorn main:app --reload
         * Default host = 127.0.0.1, port = 8000
+    * **Step 3: Test your API using Swagger UI**
+        * http://127.0.0.1:8000/docs
 ### LineBot
