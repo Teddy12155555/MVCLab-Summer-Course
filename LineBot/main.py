@@ -1,3 +1,4 @@
+from imp import reload
 import os
 from fastapi import FastAPI, Request, HTTPException
 from linebot import LineBotApi, WebhookHandler
@@ -8,6 +9,8 @@ app = FastAPI()
 
 CHANNEL_TOKEN = os.getenv('LINE_TOKEN')
 CHANNEL_SECRET = os.getenv('LINE_SECRET')
+
+print(CHANNEL_TOKEN)
 
 My_LineBotAPI = LineBotApi(CHANNEL_TOKEN) # Connect Your API to Line Developer API by Token
 handler = WebhookHandler(CHANNEL_SECRET) # Event handler connect to Line Bot by Secret key
@@ -36,3 +39,7 @@ def handle_textmessage(event):
         event.reply_token,
         message
     )
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app='main:app', reload=True, host='0.0.0.0', port=8787)
