@@ -34,7 +34,7 @@ async def callback(request: Request):
 # All message events are handling at here !
 @handler.add(MessageEvent, message=TextMessage)
 def handle_textmessage(event):
-    message = event.message.text
+    message = TextSendMessage(text= event.message.text)
     My_LineBotAPI.reply_message(
         event.reply_token,
         message
