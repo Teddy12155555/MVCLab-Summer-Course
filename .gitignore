@@ -2,10 +2,11 @@
 __pycache__
 PowerPoint
 AWS
-LineBot
 FastAPI/fastapi-tutorial
+Certs
 .DS_Store
 # File
 *.json
 *.pem
 *.ppk
+bot.py
