@@ -1,0 +1,5 @@
+line-bot-sdk
+fastapi
+uvicorn
+typing
+python-dotenv
