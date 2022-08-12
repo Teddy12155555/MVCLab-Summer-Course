@@ -1,6 +1,5 @@
 from os import abort
-from urllib import request
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, APIRouter, HTTPException, Header
 from typing import Optional, Text
 from linebot import (
     LineBotApi, WebhookHandler
@@ -8,11 +7,15 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-)
+from linebot.models import *
 
 app = FastAPI()
+
+router = APIRouter(
+    prefix="/webhooks",
+    tags=["chatbot"],
+    responses={404: {"description": "Not found"}},
+)
 
 CHANNEL_ACCESS_TOKEN = 'asFNhw2Th+xWFsOxcaJ7MhL+Et9OKoAQKnsjgtEbevVkS0u4E2fXRavGJl6cCYEWmydyPPfWO4v75zus0ft3H1mx/ngBFrit5qw2848xYGBT/OH8ZG/bEIFNLU4VBMqbt/Q7lS/hmIQmKzZydO09pwdB04t89/1O/w1cDnyilFU='
 CHANNEL_SECRET = 'c31eff1a497b39443fefeb349c826638'
@@ -24,20 +27,13 @@ handler = WebhookHandler(CHANNEL_SECRET) # Add your line developer channel secre
 line_bot_api.push_message(CHANNEL_ID, TextSendMessage(text='You Can Start Now'))
 
 @app.post('/callback')
-def callback(request:Request):
-    # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
-
-    # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-
-    # handle webhook body
+def callback(request:Request, x_line_signature: str = Header(None)):
+    body = request.body()
     try:
-        handler.handle(body, signature)
+        handler.handle(body.decode("utf-8"), x_line_signature)
     except InvalidSignatureError:
-        abort(400)
-    return "OK"
+        raise HTTPException(status_code=400, detail="chatbot handle body error.")
+    return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
