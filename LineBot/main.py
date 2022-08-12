@@ -1,16 +1,16 @@
-from imp import reload
 import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 
+load_dotenv() # Load your local environment variables
+
 app = FastAPI()
 
-CHANNEL_TOKEN = os.getenv('LINE_TOKEN')
+CHANNEL_TOKEN = os.environ.get('LINE_TOKEN')
 CHANNEL_SECRET = os.getenv('LINE_SECRET')
-
-print(CHANNEL_TOKEN)
 
 My_LineBotAPI = LineBotApi(CHANNEL_TOKEN) # Connect Your API to Line Developer API by Token
 handler = WebhookHandler(CHANNEL_SECRET) # Event handler connect to Line Bot by Secret key
