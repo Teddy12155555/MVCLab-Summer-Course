@@ -26,51 +26,51 @@ handler = WebhookHandler(CHANNEL_SECRET) # Add your line developer channel secre
 
 line_bot_api.push_message(CHANNEL_ID, TextSendMessage(text='You Can Start Now'))
 
-@app.post('/callback')
-def callback(request:Request, x_line_signature: str = Header(None)):
-    body = request.body()
-    try:
-        handler.handle(body.decode("utf-8"), x_line_signature)
-    except InvalidSignatureError:
-        raise HTTPException(status_code=400, detail="chatbot handle body error.")
-    return 'OK'
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    message = TextSendMessage(text=event.message.text)
-    line_bot_api.reply_message(event.reply_token,message)
-
-# @app.get('/callback')
-# def hello_word():
-#     return {"hello" : "world"}
-
-# @app.post('/message')
-# async def hello_word(request: Request):
-#     signature = request.headers['X-Line-Signature']
-#     body = await request.body()
-    
+# @app.post('/callback')
+# def callback(request:Request, x_line_signature: str = Header(None)):
+#     body = request.body()
 #     try:
-#       handler.handle(body.decode('UTF-8'), signature)
+#         handler.handle(body.decode("utf-8"), x_line_signature)
 #     except InvalidSignatureError:
-#         print("Invalid signature. Please check your channel access token/channel secret.")
+#         raise HTTPException(status_code=400, detail="chatbot handle body error.")
 #     return 'OK'
 
 # @handler.add(MessageEvent, message=TextMessage)
 # def handle_message(event):
-#         if event.message.text == 'hello' : 
-#             sendMessage(event,"hello, here you are")
-#         else:
-#             echo(event)
+#     message = TextSendMessage(text=event.message.text)
+#     line_bot_api.reply_message(event.reply_token,message)
+
+@app.get('/callback')
+def hello_word():
+    return {"hello" : "world"}
+
+@app.post('/message')
+async def hello_word(request: Request):
+    signature = request.headers['X-Line-Signature']
+    body = await request.body()
     
-# def echo(event):
-#         line_bot_api.reply_message(
-#             event.reply_token,
-#             TextSendMessage(text=event.message.text))
+    try:
+      handler.handle(body.decode('UTF-8'), signature)
+    except InvalidSignatureError:
+        print("Invalid signature. Please check your channel access token/channel secret.")
+    return 'OK'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+        if event.message.text == 'hello' : 
+            sendMessage(event,"hello, here you are")
+        else:
+            echo(event)
+    
+def echo(event):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=event.message.text))
         
-# def sendMessage(event,message):
-#         line_bot_api.reply_message(
-#             event.reply_token,
-#             TextSendMessage(text=message))
+def sendMessage(event,message):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=message))
 
 if __name__ == "__main__":
     import uvicorn
