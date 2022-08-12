@@ -10,3 +10,4 @@ Certs
 *.pem
 *.ppk
 bot.py
+LineBot/requirements.txt
