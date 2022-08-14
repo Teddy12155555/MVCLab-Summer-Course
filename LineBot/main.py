@@ -1,8 +1,6 @@
-from email import message
 import os
 import re
 import json
-import glob
 from dotenv import load_dotenv
 from pyquery import PyQuery
 from fastapi import FastAPI, Request, HTTPException
@@ -97,24 +95,16 @@ def handle_textmessage(event):
     # Case 2: show my pokemons (if existed)
     elif re.match(my_event[1], case_):
         if len(my_pokemons):
-            message_arr = [] # Message size must between 1 to 5 !
-            message_arr.append(TextSendMessage(text='Here is your pokemons :'))
-            for pokename, url in my_pokemons.items():
-                if len(message_arr) == 5:
-                    # Notion: reply_token can only be used once !
-                    My_LineBotAPI.reply_message(
-                        event.reply_token,
-                        message_arr
-                    )
-                    message_arr.clear()
+            message = 'Here is your pokemons :\n'
+            for idx, pokename in enumerate(my_pokemons.keys(), 1):
                 # Send Poke name
-                message_arr.append(TextSendMessage(text= pokename))
-            # Reply multiple messages (if existed)
-            for message in message_arr:
-                My_LineBotAPI.push_message(
-                    CHANNEL_ID,
-                    message
-                )
+                message += str(idx) + ': ' + pokename + '\n'
+            # LineBot Reply Message can only send up to 5, otherwise you will see an error in console
+            # LineBot event reply_token can only be used once !
+            My_LineBotAPI.reply_message(
+                event.reply_token,
+                TextSendMessage(text=message)
+            )
         else:
             My_LineBotAPI.push_message(
                 event.reply_token,
