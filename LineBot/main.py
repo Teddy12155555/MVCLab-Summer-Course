@@ -1,3 +1,20 @@
+'''
+This is my LineBot API
+How to Start:
+    > Step 0. Go to ./MVCLab-Summer-Course/LineBot/
+        > cd ./MVCLab-Summer-Course/LineBot
+    > Step 1. Install Python Packages
+        > pip install -r requirements.txt
+    > Step 2. Run main.py
+        > python main.py
+Reference:
+1. LineBot API for Python
+    > https://github.com/line/line-bot-sdk-python
+2. Pokemon's reference
+    > https://pokemondb.net/pokedex/all
+3. Line Developer Messaging API Doc
+    > https://developers.line.biz/en/docs/messaging-api/
+'''
 import os
 import re
 import json
@@ -42,6 +59,7 @@ For first testing, you can comment the code below after you check your linebot c
 CHANNEL_ID = os.getenv('LINE_UID') # For any message pushing to or pulling from Line Bot using this ID
 # My_LineBotAPI.push_message(CHANNEL_ID, TextSendMessage(text='Welcome to my pokedex !')) # Push a testing message
 
+# Line Developer Webhook Entry Point
 @app.post('/')
 async def callback(request: Request):
     body = await request.body() # Get request
