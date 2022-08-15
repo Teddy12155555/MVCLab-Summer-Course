@@ -46,10 +46,10 @@ for poke in doc:
         # Save a pokemon's img info
         pokemons_imgs[poke_name] = poke_url
 
-app = FastAPI()
-
 CHANNEL_TOKEN = os.environ.get('LINE_TOKEN')
 CHANNEL_SECRET = os.getenv('LINE_SECRET')
+
+app = FastAPI()
 
 My_LineBotAPI = LineBotApi(CHANNEL_TOKEN) # Connect Your API to Line Developer API by Token
 handler = WebhookHandler(CHANNEL_SECRET) # Event handler connect to Line Bot by Secret key
@@ -84,6 +84,7 @@ async def callback(request: Request):
 # All message events are handling at here !
 @handler.add(MessageEvent, message=TextMessage)
 def handle_textmessage(event):
+    global my_pokemons
     ''' Basic Message Reply
     message = TextSendMessage(text= event.message.text)
     My_LineBotAPI.reply_message(
@@ -115,7 +116,7 @@ def handle_textmessage(event):
             )
     # Case 2: show my pokemons (if existed)
     elif re.match(my_event[1], case_):
-        if len(my_pokemons):
+        if len(my_pokemons) > 0:
             message = 'Here is your pokemons :\n'
             for idx, pokename in enumerate(my_pokemons.keys(), 1):
                 # Send Poke name
@@ -127,7 +128,7 @@ def handle_textmessage(event):
                 TextSendMessage(text=message)
             )
         else:
-            My_LineBotAPI.push_message(
+            My_LineBotAPI.reply_message(
                 event.reply_token,
                 TextSendMessage(text='You don\'t have any pokemon')
             )
