@@ -18,6 +18,7 @@ Reference:
 import os
 import re
 import json
+import random
 from dotenv import load_dotenv
 from pyquery import PyQuery
 from fastapi import FastAPI, Request, HTTPException
@@ -90,7 +91,9 @@ def handle_textmessage(event):
         message
     )
     '''
+    # Split message by white space
     recieve_message = str(event.message.text).split(' ')
+    # Get first splitted message as command
     case_ = recieve_message[0].lower().strip()
     # Case 1: get pokemon
     if re.match(my_event[0], case_):
@@ -138,8 +141,10 @@ def handle_textmessage(event):
                     TextSendMessage(text=f'You have already add {pokename} into your pokedex !')
                 )
             else:
-                # Add a new pokemon into my pokedex
+                # Add a new pokemon into my pokedex and sorted by key value
                 my_pokemons[pokename] = pokemons_imgs[pokename]
+                my_pokemons = dict(sorted(my_pokemons.items()))
+                # Save to local json file
                 with open(poke_file, 'w') as f:
                     json.dump(my_pokemons, f, indent=4)
                 # Reply successful message
@@ -158,6 +163,7 @@ def handle_textmessage(event):
         if pokename in my_pokemons.keys():
             # Remove an existed pokemon in my pokedex
             my_pokemons.pop(pokename)
+            # Save to local json file
             with open(poke_file, 'w') as f:
                 json.dump(my_pokemons, f, indent=4)
             # Reply successful message
@@ -186,6 +192,38 @@ def handle_textmessage(event):
             event.reply_token,
             TextSendMessage(text='Welcome to my pokedex ! Enter "#help" for commands !')
         )
+
+class My_Sticker:
+    def __init__(self, p_id: str, s_id: str):
+        self.type = 'sticker'
+        self.packageID = p_id
+        self.stickerID = s_id
+
+'''
+See more about Line Sticker, references below
+> Line Developer Message API, https://developers.line.biz/en/reference/messaging-api/#sticker-message
+> Line Bot Free Stickers, https://developers.line.biz/en/docs/messaging-api/sticker-list/
+'''
+# Add stickers into my_sticker list
+my_sticker = [My_Sticker(p_id='446', s_id='1995'), My_Sticker(p_id='446', s_id='2012'),
+     My_Sticker(p_id='446', s_id='2024'), My_Sticker(p_id='446', s_id='2027'),
+     My_Sticker(p_id='789', s_id='10857'), My_Sticker(p_id='789', s_id='10877'),
+     My_Sticker(p_id='789', s_id='10881'), My_Sticker(p_id='789', s_id='10885'),
+     ]
+
+# Line Sticker Event
+@handler.add(MessageEvent, message=StickerMessage)
+def handle_sticker(event):
+    # Random choice a sticker from my_sticker list
+    ran_sticker = random.choice(my_sticker)
+    # Reply Sticker Message
+    My_LineBotAPI.reply_message(
+        event.reply_token,
+        StickerSendMessage(
+            package_id= ran_sticker.packageID,
+            sticker_id= ran_sticker.stickerID
+        )
+    )
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(app='main:app', reload=True, host='0.0.0.0', port=8787)
