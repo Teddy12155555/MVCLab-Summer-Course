@@ -60,6 +60,16 @@ For first testing, you can comment the code below after you check your linebot c
 CHANNEL_ID = os.getenv('LINE_UID') # For any message pushing to or pulling from Line Bot using this ID
 # My_LineBotAPI.push_message(CHANNEL_ID, TextSendMessage(text='Welcome to my pokedex !')) # Push a testing message
 
+# Events for message reply
+my_event = ['#getpokemon', '#mypokemon', '#addpokemon', '#delpokemon', '#help']
+# My pokemon datas
+my_pokemons = dict()
+poke_file = 'my_pokemons.json'
+# Load local json file if exist
+if os.path.exists(poke_file):
+    with open(poke_file, 'r') as f:
+        my_pokemons = json.load(f)
+
 # Line Developer Webhook Entry Point
 @app.post('/')
 async def callback(request: Request):
@@ -70,16 +80,6 @@ async def callback(request: Request):
     except InvalidSignatureError:
         raise HTTPException(404, detail='LineBot Handle Body Error !')
     return 'OK'
-
-# Events for message reply
-my_event = ['#getpokemon', '#mypokemon', '#addpokemon', '#delpokemon', '#help']
-# My pokemon datas
-my_pokemons = dict()
-poke_file = 'my_pokemons.json'
-# Load local json file if exist
-if os.path.exists(poke_file):
-    with open(poke_file, 'r') as f:
-        my_pokemons = json.load(f)
 
 # All message events are handling at here !
 @handler.add(MessageEvent, message=TextMessage)
