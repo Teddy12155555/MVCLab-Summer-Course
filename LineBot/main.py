@@ -70,6 +70,17 @@ if os.path.exists(poke_file):
     with open(poke_file, 'r') as f:
         my_pokemons = json.load(f)
 
+'''
+See more about Line Emojis, references below
+> Line Bot Free Emojis, https://developers.line.biz/en/docs/messaging-api/emoji-list/
+'''
+# Create my emoji list
+my_emoji = [
+    [{'index':27, 'productId':'5ac1bfd5040ab15980c9b435', 'emojiId':'005'}],
+    [{'index':27, 'productId':'5ac1bfd5040ab15980c9b435', 'emojiId':'019'}],
+    [{'index':27, 'productId':'5ac1bfd5040ab15980c9b435', 'emojiId':'096'}]
+]
+
 # Line Developer Webhook Entry Point
 @app.post('/')
 async def callback(request: Request):
@@ -128,9 +139,14 @@ def handle_textmessage(event):
                 TextSendMessage(text=message)
             )
         else:
+            # Reply message with emoji
+            reply_emoji = random.choice(my_emoji)
             My_LineBotAPI.reply_message(
                 event.reply_token,
-                TextSendMessage(text='You don\'t have any pokemon')
+                TextSendMessage(
+                    text='You don\'t have any pokemon $',
+                    emojis= reply_emoji
+                )
             )
     # Case 3: add a pokemon into my pokedex
     elif re.match(my_event[2], case_):
@@ -179,21 +195,40 @@ def handle_textmessage(event):
             )
     # Help command for listing all commands to user
     elif re.match(my_event[4], case_):
-        command_describtion = 'Commands:\n\
+        command_describtion = '$ Commands:\n\
         #getpokemon <pokemon\'s name>\n\t-->Show this pokemon\'s name & Image for you if existed !\n\
         #mypokemon\n\t-->List all pokemons in your pokedex if existed !\n\
         #addpokemon <pokemon\'s name>\n\t-->Add a pokemon from global pokedex into your pokedex if existed !\n\
         #delpokemon <pokemon\'s name>\n\t-->Delete a pokemon from your pokedex if existed !\n'
         My_LineBotAPI.reply_message(
             event.reply_token,
-            TextSendMessage(text=command_describtion)
+            TextSendMessage(
+                text=command_describtion,
+                emojis=[
+                    {
+                        'index':0,
+                        'productId':'5ac21a18040ab15980c9b43e',
+                        'emojiId':'110'
+                    }
+                ]
+            )
         )
     else:
         My_LineBotAPI.reply_message(
             event.reply_token,
-            TextSendMessage(text='Welcome to my pokedex ! Enter "#help" for commands !')
+            TextSendMessage(
+                text='$ Welcome to my pokedex ! Enter "#help" for commands !',
+                emojis=[
+                    {
+                        'index':0,
+                        'productId':'5ac2213e040ab15980c9b447',
+                        'emojiId':'035'
+                    }
+                ]
+            )
         )
 
+# Line Sticker Class
 class My_Sticker:
     def __init__(self, p_id: str, s_id: str):
         self.type = 'sticker'
