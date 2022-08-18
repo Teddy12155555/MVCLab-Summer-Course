@@ -25,6 +25,36 @@ from fastapi import FastAPI, Request, HTTPException
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
+from influxdb import InfluxDBClient
+"""
+init DB
+"""
+class DB():
+    def __init__(self, ip, port, user, password, db_name):
+        self.client = InfluxDBClient(ip, port, user, password, db_name) 
+        print('Influx DB init.....')
+
+    def insertData(self, data):
+        """
+        [data] should be a list of datapoint JSON,
+        "measurement": means table name in db
+        "tags": you can add some tag as key
+        "fields": data that you want to store
+        """
+        if self.client.write_points(data):
+            return True
+        else:
+            print('Falied to write data')
+            return False
+
+    def queryData(self, query):
+        """
+        [query] should be a SQL like query string
+        """
+        return self.client.query(query)
+
+# Init a Influx DB and connect to it
+db = DB('127.0.0.1', 8086, 'root', '', 'accounting_db')
 
 load_dotenv() # Load your local environment variables
 
@@ -57,11 +87,12 @@ handler = WebhookHandler(CHANNEL_SECRET) # Event handler connect to Line Bot by 
 '''
 For first testing, you can comment the code below after you check your linebot can send you the message below
 '''
-CHANNEL_ID = os.getenv('LINE_UID') # For any message pushing to or pulling from Line Bot using this ID
+#CHANNEL_ID = os.getenv('LINE_UID') # For any message pushing to or pulling from Line Bot using this ID
 # My_LineBotAPI.push_message(CHANNEL_ID, TextSendMessage(text='Welcome to my pokedex !')) # Push a testing message
 
 # Events for message reply
-my_event = ['#getpokemon', '#mypokemon', '#addpokemon', '#delpokemon', '#help']
+my_event = ['#getpokemon', '#mypokemon', '#addpokemon', '#delpokemon', '#help'
+, '#note', '#report']
 # My pokemon datas
 my_pokemons = dict()
 poke_file = 'my_pokemons.json'
@@ -213,18 +244,68 @@ def handle_textmessage(event):
                 ]
             )
         )
+    elif re.match(my_event[5], case_):
+        # cmd: #note [事件] [+/-] [錢]
+        event_ = recieve_message[1]
+        op = recieve_message[2]
+        money = int(recieve_message[3])
+        # process +/-
+        if op == '-':
+            money *= -1
+        # get user id
+        user_id = event.source.user_id
+        
+        # build data
+        data = [
+            {
+                "measurement" : "accounting_items",
+                "tags": {
+                    "user": str(user_id),
+                    # "category" : "food"
+                },
+                "fields":{
+                    "event": str(event_),
+                    "money": money
+                }
+            }
+        ]
+        if db.insertData(data):
+            # successed
+            My_LineBotAPI.reply_message(
+                event.reply_token,
+                TextSendMessage(
+                    text="Write to DB Successfully!"
+                )
+            )
+
+    elif re.match(my_event[6], case_):
+        # get user id
+        user_id = event.source.user_id
+        query_str = """
+        select * from accounting_items 
+        """
+        result = db.queryData(query_str)
+        points = result.get_points(tags={'user': str(user_id)})
+        
+        reply_text = ''
+        for i, point in enumerate(points):
+            time = point['time']
+            event_ = point['event']
+            money = point['money']
+            reply_text += f'[{i}] -> [{time}] : {event_}   {money}\n'
+
+        My_LineBotAPI.reply_message(
+            event.reply_token,
+            TextSendMessage(
+                text=reply_text
+            )
+        )
+
     else:
         My_LineBotAPI.reply_message(
             event.reply_token,
             TextSendMessage(
-                text='$ Welcome to my pokedex ! Enter "#help" for commands !',
-                emojis=[
-                    {
-                        'index':0,
-                        'productId':'5ac2213e040ab15980c9b447',
-                        'emojiId':'035'
-                    }
-                ]
+                text=str(event.message.text)
             )
         )
 
